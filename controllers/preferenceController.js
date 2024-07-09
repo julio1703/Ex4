@@ -126,6 +126,44 @@ const preferencesController = {
             res.status(500).json({error: error.message});
             await connection.end();
         }
+    },
+
+    async getVacationResult(req, res) {
+        const connection = await dbConnection.createConnection();
+
+        try {
+            let [rows] = await connection.execute("SELECT * FROM tbl_27_preferences");
+            if(rows.length < 5)
+                return res.status(404).json({error: "Not all 5 users have added their preferences"});
+
+            [rows] = await connection.execute("SELECT * FROM tbl_27_preferences group by destination order by COUNT(destination) DESC, id ASC LIMIT 1");
+            const vacationDestination = rows[0].destination;
+
+            [rows] = await connection.execute("SELECT * FROM tbl_27_preferences group by vacation_type order by COUNT(vacation_type) DESC, id ASC LIMIT 1");
+            const vacationType = rows[0].vacation_type;
+
+            [rows] = await connection.execute("SELECT * FROM tbl_27_preferences order by start_date DESC LIMIT 1");
+            const startDate = rows[0].start_date;
+
+            [rows] = await connection.execute("SELECT * FROM tbl_27_preferences order by end_date ASC LIMIT 1");
+            const endDate = rows[0].end_date;
+
+            const duration = (Date.parse(endDate) - Date.parse(startDate)) / (1000 * 60 * 60 * 24);
+            if(duration > 7 || duration < 0)
+                return res.status(400).json({error: "There is no suitable vacation date for everyone"});
+
+            res.status(200).json({
+                message: "Vacation Result",
+                destination: destination,
+                "vacation-type": vacationType,
+                "start-date": startDate,
+                "end-date": endDate
+            })
+            await connection.end();
+        } catch (error) {
+            res.status(500).json({error: error.message});
+            await connection.end();
+        }
     }
 };
 
