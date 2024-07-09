@@ -2,6 +2,28 @@ const {dbConnection} = require("../db_connection");
 const {vacationDestinations} = require("../data/vacation_destinations.json");
 const {vacationTypes} = require("../data/vacation_types.json");
 
+function checkPreference(res, startDate, endDate, vacationDestination, vacationType){
+    if(isNaN(Date.parse(startDate)))
+        return res.status(400).json({error: "Invalid start date format", format: "YYYY/MM/DD"});
+
+    if(isNaN(Date.parse(endDate)))
+        return res.status(400).json({error: "Invalid end date format", format: "YYYY/MM/DD"});
+
+    if(Date.parse(endDate) < Date.parse(startDate))
+        return res.status(400).json({error: "Start date can't be after end date"});
+
+    if((Date.parse(endDate) - Date.parse(startDate)) / (1000 * 60 * 60 * 24) > 7)
+        return res.status(400).json({error: "The duration of the vacation should be less than a week"});
+
+    if(!vacationDestinations.includes(vacationDestination))
+        return res.status(400).json({error: "Invalid vacation destination", "vacation-destination": vacationDestinations});
+
+    if(!vacationTypes.includes(vacationType))
+        return res.status(400).json({error: "Invalid vacation type", "vacation-types": vacationTypes});
+
+    return;
+}
+
 const preferencesController = {
     async getAllPreferences(req, res) {
         const connection = await dbConnection.createConnection();
@@ -37,29 +59,11 @@ const preferencesController = {
     },
 
     async addUserPreference(req, res) {
-        console.log("here");
-
         const {accessToken, startDate, endDate, vacationDestination, vacationType} = req.body;
         if(!accessToken || !startDate || !endDate || !vacationDestination || !vacationType)
             return res.status(400).json({error: "Provide all required fields (accessToken, startDate, endDate, vacationDestination, vacationType)"});
 
-        if(isNaN(Date.parse(startDate)))
-            return res.status(400).json({error: "Invalid start date format", format: "YYYY/MM/DD"});
-
-        if(isNaN(Date.parse(endDate)))
-            return res.status(400).json({error: "Invalid end date format", format: "YYYY/MM/DD"});
-
-        if(Date.parse(endDate) < Date.parse(startDate))
-            return res.status(400).json({error: "Start date can't be after end date"});
-
-        if((Date.parse(endDate) - Date.parse(startDate)) / (1000 * 60 * 60 * 24) > 7)
-            return res.status(400).json({error: "The duration of the vacation should be less than a week"});
-
-        if(!vacationDestinations.includes(vacationDestination))
-            return res.status(400).json({error: "Invalid vacation destination", "vacation-destination": vacationDestinations});
-
-        if(!vacationTypes.includes(vacationType))
-            return res.status(400).json({error: "Invalid vacation type", "vacation-types": vacationTypes});
+        checkPreference(res, startDate, endDate, vacationDestination, vacationType);
 
         const connection = await dbConnection.createConnection();
 
@@ -86,6 +90,15 @@ const preferencesController = {
             res.status(500).json({error: error.message});
             await connection.end();
         }
+    },
+
+    async updateUserPreference(req, res) {
+        const {accessToken, startDate, endDate, vacationDestination, vacationType} = req.body;
+        if(!accessToken || !startDate || !endDate || !vacationDestination || !vacationType)
+            return res.status(400).json({error: "Provide all required fields (accessToken, startDate, endDate, vacationDestination, vacationType)"});
+
+        checkPreference(res, startDate, endDate, vacationDestination, vacationType);
+
     }
 };
 
