@@ -1,5 +1,5 @@
 const {dbConnection} = require("../db_connection");
 
-const userController = {};
+const preferencesController = {};
 
-module.exports = { userController };
+module.exports = { preferencesController };
