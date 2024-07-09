@@ -33,7 +33,6 @@ const userController = {
 
     async getUserAccessToken(req, res) {
         const {username, password} = req.body;
-        console.log(username, password);
         if(!username || !password)
             return res.status(404).json({error: "Invalid username and password"});
 
