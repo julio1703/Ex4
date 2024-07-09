@@ -154,7 +154,7 @@ const preferencesController = {
 
             res.status(200).json({
                 message: "Vacation Result",
-                destination: destination,
+                destination: vacationDestination,
                 "vacation-type": vacationType,
                 "start-date": startDate,
                 "end-date": endDate

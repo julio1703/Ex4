@@ -14,7 +14,7 @@ const userController = {
                 return res.status(400).send({error: "Username Already Exists"});
 
             [rows] = await connection.execute(`SELECT * FROM tbl_27_users`);
-            if(rows.length > 5)
+            if(rows.length > 4)
                 return res.status(400).send({error: "Reached Maximum Users"});
 
             const access_token = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);

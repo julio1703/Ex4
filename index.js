@@ -19,6 +19,9 @@ app.use((req, res, next) => {
 app.use("/api/user", userRouter);
 app.use("/api/preferences", preferencesRouter);
 
+app.use((req, res) => {
+    res.json({error: "No API found"});
+})
 
 app.listen(port, () => {
     console.log(`App is listening on port ${port}`);
