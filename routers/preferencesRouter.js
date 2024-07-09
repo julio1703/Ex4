@@ -1,8 +1,9 @@
 const { Router } = require('express');
-const { preferenceController } = require('../controllers/preferenceController');
+const { preferencesController } = require('../controllers/preferenceController');
 
-const preferenceRouter = Router();
+const preferencesRouter = Router();
 
+preferencesRouter.get("/", preferencesController.getAllPreferences);
+preferencesRouter.get("/:username", preferencesController.getUserPreference);
 
-
-module.exports = { preferenceRouter };
+module.exports = { preferencesRouter };

@@ -9,7 +9,7 @@ const userController = {
         const connection = await dbConnection.createConnection();
 
         try {
-            let [rows] = await connection.execute(`SELECT username FROM tbl_27_users WHERE username = ${username}`);
+            let [rows] = await connection.execute(`SELECT username FROM tbl_27_users WHERE username = "${username}"`);
             if(rows[0])
                 return res.status(400).send({error: "Username Already Exists"});
 
@@ -19,7 +19,7 @@ const userController = {
 
             const access_token = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
 
-            [rows] = await connection.execute(`INSERT INTO tbl_27_users (username, password, access_token) VALUES(${username}, ${password}, ${access_token})`);
+            [rows] = await connection.execute(`INSERT INTO tbl_27_users (username, password, access_token) VALUES("${username}", "${password}", "${access_token}")`);
             if(rows.affectedRows === 0)
                 return res.status(500).json({error: "Server error couldn't register user"});
 
@@ -33,13 +33,14 @@ const userController = {
 
     async getUserAccessToken(req, res) {
         const {username, password} = req.body;
+        console.log(username, password);
         if(!username || !password)
             return res.status(404).json({error: "Invalid username and password"});
 
         const connection = await dbConnection.createConnection();
 
         try {
-            const [rows] = connection.execute(`SELECT access_token FROM tbl_27_users WHERE username = ${username} AND password = ${password}`);
+            const [rows] = await connection.execute(`SELECT access_token FROM tbl_27_users WHERE username = '${username}' AND password = '${password}'`);
             if(rows.length === 0)
                 return res.status(400).json({error: "Incorrect username or password"});
 
