@@ -114,7 +114,7 @@ const preferencesController = {
             const userId = rows[0].id;
             [rows] = await connection.execute(`SELECT * FROM tbl_27_preferences WHERE user_id = ${userId}`);
             if(rows.length === 0)
-                return res.status(400).json({error: "User doesn't have a vacation preference"});
+                return res.status(404).json({error: "User doesn't have a vacation preference"});
 
             [rows] = await connection.execute(`UPDATE tbl_27_preferences SET start_date = '${startDate}', end_date = '${endDate}', destination = '${vacationDestination}', vacation_type = '${vacationType}' WHERE user_id = ${userId}`);
             if(rows.affectedRows === 0)
